@@ -1,12 +1,16 @@
+from django.contrib.auth.forms import AuthenticationForm
 from django.views.generic import TemplateView
 
 from news.models import Category, Article
+from user.forms import UserCreationForm
 
 
 # Create your views here.
 class BaseView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['register_form'] = UserCreationForm()  # Adding here because the form should be on all pages
+        context['login_form'] = AuthenticationForm()  # Adding here because the form should be on all pages
         context['categories'] = Category.objects.all()
         return context
 

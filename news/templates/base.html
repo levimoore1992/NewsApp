@@ -16,16 +16,78 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-          <div class="navbar-nav">
+          <div class="navbar-nav mr-auto">
             {% for category in categories %}
                 <a class="nav-link active" aria-current="page" href="{% url 'category' id=category.id %}">{{ category.name }}</a>
             {% endfor %}
+          </div>
+          <div class="navbar-nav">
+            {% if user.is_authenticated %}
+              <span class="navbar-text">{{ user.username }}</span>
+                <a class="nav-link" href="{% url 'logout' %}?next={{ request.path }}">Logout</a>
+            {% else %}
+              <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">Login/Register</button>
+            {% endif %}
           </div>
         </div>
       </div>
     </nav>
 
 
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="registerModalLabel">Register</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <div id="registerForm">
+          <h5 class="modal-title">Register</h5>
+          <form method="POST" action="{% url 'register' %}?next={{ request.path }}">
+            {% csrf_token %}
+            {{ register_form.as_p }}
+            <button type="submit" class="btn btn-primary">Register</button>
+          </form>
+          <p class="text-center">
+            Already registered? <a href="#" id="showLoginForm">Click here to login</a>
+          </p>
+        </div>
+
+              <div id="loginForm" style="display: none;">
+                  <h5 class="modal-title">Login</h5>
+                  <form method="POST" action="{% url 'login' %}?next={{ request.path }}">
+                    {% csrf_token %}
+                    {{ login_form.as_p }}
+                    <button type="submit" class="btn btn-primary">Login</button>
+                  </form>
+                  <p class="text-center">
+                    Not registered yet? <a href="#" id="showRegisterForm">Click here to register</a>
+                  </p>
+                </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+
     {% block content %}{% endblock %}
 </body>
+
+{% block javascript %}
+    <script>
+    document.getElementById('showLoginForm').addEventListener('click', function(e) {
+      e.preventDefault();
+      document.getElementById('registerForm').style.display = 'none';
+      document.getElementById('loginForm').style.display = 'block';
+    });
+
+    document.getElementById('showRegisterForm').addEventListener('click', function(e) {
+      e.preventDefault();
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('registerForm').style.display = 'block';
+    });
+    </script>
+{% endblock %}
 </html>
